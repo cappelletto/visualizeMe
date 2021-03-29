@@ -1,14 +1,14 @@
-function [stats] = computeStats(data)
-    _max    = max (data);
-    _min    = min (data);
-    _mean   = mean (data);
-    _median = median (data);
-    _std    = std (data);
+% function [stats] = computeStats(data)
+%     max_    = max (data);
+%     min    = min (data);
+%     _mean   = mean (data);
+%     _median = median (data);
+%     _std    = std (data);
 
 
 %% Pipeline structure
 %% TODO: use Matlab parser for optional/positional arguments
-function [retval] = prediction_analyze(filename, num_bins)
+function [retval] = predictionAnalyzer(filename, num_bins)
 
 % Input argumets:
 % CSV filename [required]
@@ -81,16 +81,5 @@ hold on
 bar (Q,'r')
 bar (R,'b')
 
-acum = 0;
-% Now, we compute the KL-divergence
-for x=1:K
-    acum = acum + P(x) * log(P(x)/Q(x));
-end
-kld_Q = acum
-
-acum = 0;
-% Now, we compute the KL-divergence
-for x=1:K
-    acum = acum + P(x) * log(P(x)/R(x));
-end
-kld_R = acum
+kld_Q = divergence_KL(P,Q)
+kld_R = divergence_KL(P,R)

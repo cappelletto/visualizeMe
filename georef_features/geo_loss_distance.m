@@ -27,7 +27,6 @@ end
 files = dir(strcat(folder_path, 'loss_*.csv'));
 
 K = length(files);   % Number of files
-% TODO: Make N an user defined parameter
 if ~exist('N', 'var')
     warning ("N last samples to average per training run set to default N=10")
     folder_path = './'
@@ -35,7 +34,7 @@ if ~exist('N', 'var')
 end
 
 % Create empty vector to store the mean loss for each loss function
-mean_loss_all      = zeros(K,1);
+mean_loss      = zeros(K,1);
 length_meter       = zeros(K,1);
 
 % for each file, we read the data, first row contains the column names
@@ -43,30 +42,27 @@ length_meter       = zeros(K,1);
 for i = 1:K
     data = readtable(strcat(folder_path,files(i).name));
     % Extract the length parameter from the file name
+    % Each filename is expected to be named "loss_*L<lenght_in_meter>m.csv"
     length_meter(i) = str2double(files(i).name(7:end-5)); % it will be in L<length_meter>m.csv format
-    % The expected table headers are: loss_recon, loss_all, loss_location
-    %   loss_recon is the reconstruction loss
-    %   loss_location is the location loss
-    %   loss_all is the total loss (recon + location)
 
     % geoCLR training only exports the loss funcion, single column
     % Calculate the average loss of last N epochs of loss_all
-    mean_loss_all(i) = mean (data.loss(end-N:end));
+    mean_loss(i) = mean (data.loss(end-N:end));
 end
 
 % for geoCLR feature extraction there is only one loss function
 % Before plotting, we create an empty figure
 figure; hold on; grid on;
 % Plot the loss function. X = length_meter, Y = loss
-scatter(length_meter, mean_loss_all, 'LineWidth', 2, 'MarkerEdgeColor', 'b');
-ylim([0, max(mean_loss_all).*1.05]);
+scatter(length_meter, mean_loss, 'LineWidth', 2, 'MarkerEdgeColor', 'b');
+ylim([0, max(mean_loss).*1.05]);
 xlabel('Distance parameter [m]', 'FontSize', 18);
 ylabel('geoCLR loss', 'FontSize', 18);
 title('geoCLR loss vs. distance parameter', 'FontSize', 21);
 
 % Let's plot the reciprocal of the loss function.
 % This will make it easier to see the trend
-reciprocal = log(1./mean_loss_all);
+reciprocal = log(1./mean_loss);
 % Plot the reciprocal of the loss function. X = length_meter, Y = reciprocal
 figure; hold on; grid on;
 scatter(length_meter, reciprocal, 'LineWidth', 2, 'MarkerEdgeColor', [0.8500 0.3250 0.0980]);

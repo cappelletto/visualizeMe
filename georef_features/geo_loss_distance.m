@@ -15,7 +15,7 @@
 % For example: loss_L08m.csv, loss_L16m.csv, loss_L32m.csv ...
 
 % Create a function lga_loss_distance with one parameter (path to folder)
-function [results] = lga_loss_distance(folder_path, N)
+function [results] = geo_loss_distance(folder_path, N)
 
 % Check if folder_path is not defined
 if ~exist('folder_path', 'var')

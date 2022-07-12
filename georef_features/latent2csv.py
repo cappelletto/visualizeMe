@@ -1,6 +1,15 @@
+# -*- coding: utf-8 -*-
+"""
+Copyright (c) 2022, Ocean Perception Lab, Univ. of Southampton
+All rights reserved.
+Licensed under GNU General Public License v3.0
+See LICENSE file in the project root for full license information.
+"""
+# Author: Jose Cappelletto (j.cappelletto@soton.ac.uk) 
+# Version: 0.2-rc
+# Date: 12/07/2022
 
-
-# Convert Numpy file containing latent representation to CSV file. No aguments/parameters used
+# Converts Numpy file containing latent representation to CSV file. 
 
 import numpy as np
 import pandas as pd
@@ -28,13 +37,12 @@ def main(args=None):
         "-o", "--output",
         # default='inferred.csv',
         type=str,
-        help="Filename of the exported CSV output. Rows follow the same order as defined in the input file."
+        help="Filename of the exported CSV output. Rows follow the same order as defined in the input file. 0-indexed ID column inserted"
     )
 
     # key #########################
     parser.add_argument(
         "-k", "--key",
-#        default='key',
         type=str,
         help="Defines output file column prefix. Default is 'latent_'"
     )
@@ -52,7 +60,7 @@ def main(args=None):
 
     if (args.input):    # user provided input filename
         input_file = args.input
-        print ("User defined input filename: " + input_file)
+        # print ("User defined input filename: " + input_file)
     else:
         # use default filename
         print ("Using default input filename: " + input_file)
@@ -89,7 +97,7 @@ def main(args=None):
     print("Latents dimensions:", latents_dim)
 
     # create header for the dataframe with the string "latent_" + number
-    header = ["output_key" + str(i) for i in range(latents_dim)]
+    header = [output_key + str(i) for i in range(latents_dim)]
     # create a dataframe with the header and the entries
     df = pd.DataFrame(latents_np, index=None, columns=header)
     # save the dataframe to a csv file

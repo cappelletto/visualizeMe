@@ -11,7 +11,7 @@
 
 % Retrieve and process training / validation results from trained BNN predictor
 
-function bnn_loss_test(folder_path)
+function bnn_loss_test(folder_path, dataset)
 
 % Check if folder_path is not defined
 if ~exist('folder_path', 'var')
@@ -19,8 +19,14 @@ if ~exist('folder_path', 'var')
     folder_path = './'
 end
 
-% Retrieve the list of files in the folder
-files = dir (strcat(folder_path, 'valid_*.csv'));
+% Check if dataset = train/valid option defined. Default analyze validation
+if ~exist ('dataset', 'var') 
+    warning ("Using default dataset subset: validation")
+    dataset_key = 'valid'
+end
+
+% Retrieve the list of files in the folder that correspond to the subset
+files = dir (strcat(folder_path, strcat (dataset_key, '_*.csv')));
 
 K = length(files)   % Number of files
 % Use all the rows in the train/validation output for the last exported
@@ -51,9 +57,12 @@ for i = 1:K
     % If the column name (table.Properties.VariablesNames) contains 'log' then data needs to be converted back
     % Enable /disable depending if we are using logNormal or no transformation at all
 
-    % TODO: Detect if columns need to be transformed (log / noLog)
-    target    = 10.^target;
-    predicted = 10.^predicted;
+    % Retrieve the table VariableNames (in properties)
+    if (strfind (data.Properties.VariableNames{1}, 'log') > 0)
+        print ("Log transform deteced in variable names") 
+        target    = 10.^target;
+        predicted = 10.^predicted;
+    end
 
     % Compute the RMSE of our predictions
     error = rms(target - predicted);
@@ -103,3 +112,6 @@ legend ('Fitting loss', "", 'KL-divergence loss', "");
 %legend ('Fitting loss', 'KL-divergence loss', "Total loss");
 ylim([0 max(mean_valid_fit)*1.05])
 title ("BNN valid loss vs sigma parameter. h16 - 1E6 - MID Network. ELBO = 10.0")
+
+
+% TODO: Replace scatter plot with violin or boxplots (compute mean/stdv)

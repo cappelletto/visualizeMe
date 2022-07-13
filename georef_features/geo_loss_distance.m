@@ -35,7 +35,7 @@ end
 
 % Create empty vector to store the mean loss for each loss function
 mean_loss      = zeros(K,1);
-length_meter       = zeros(K,1);
+length_meter   = zeros(K,1);
 
 % for each file, we read the data, first row contains the column names
 % and the rest of the rows contain the data

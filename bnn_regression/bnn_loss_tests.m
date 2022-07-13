@@ -107,5 +107,4 @@ end
 
 title (titleLabelString)
 
-
 % TODO: Replace scatter plot with violin or boxplots (compute mean/stdv)

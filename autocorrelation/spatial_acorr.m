@@ -115,7 +115,7 @@ boxplot(x_threshold-deltaX, 'Orientation', 'horizontal')
 text (mean(x_threshold), 1.2, sprintf("Mean lag\n%.2fm", mean(x_threshold)), 'FontSize',14)
 
 grid on;
-% plot (scatter) points at the intersections with the horizontal axis (threshold)
+% plot (scatter) points at the intersections with the horizontal axis (threshold)3
 scatter (x_threshold-deltaX, threshold*ones(1,K), 8, [0.5, 0.3, 0.3], 'filled')
 yticks([-0.5:0.5:1.0]); % fix ticks after boxplot readjust (forcing manual didn't work)
 yticklabels([-0.5:0.5:1.0])

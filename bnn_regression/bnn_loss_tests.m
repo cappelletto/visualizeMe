@@ -11,7 +11,7 @@
 
 % Retrieve and process training / validation results from trained BNN predictor
 
-function bnn_loss_test(folder_path, dataset_key, y_max)
+function bnn_loss_tests(folder_path, dataset_key, y_max)
 
 % Check if folder_path is not defined
 if ~exist('folder_path', 'var')
@@ -43,7 +43,6 @@ K = length(files)   % Number of files
 % Create empty vector to store the mean values of train/validation fit (RMSE)
 mean_error = zeros(K,1);
 length_meter   = zeros(K,1);
-
 % for each file, we read the data, first row contains the column names
 % and the rest of the rows contain the data
 for i = 1:K
@@ -59,10 +58,10 @@ for i = 1:K
 
     % If the column name (table.Properties.VariablesNames) contains 'log' then data needs to be converted back
     % Enable /disable depending if we are using logNormal or no transformation at all
-
+    
     % Retrieve the table VariableNames (in properties)
     if (strfind (data.Properties.VariableNames{1}, 'log') > 0)
-        sprintf ("Log transform deteced in variable names") 
+        sprintf ("Log transform detected in variable names") 
         target    = 10.^target;
         predicted = 10.^predicted;
     end
@@ -105,6 +104,6 @@ else
     ylim([0 y_max])
 end
 
-title (titleLabelString)
+title (titleLabelString);
 
 % TODO: Replace scatter plot with violin or boxplots (compute mean/stdv)

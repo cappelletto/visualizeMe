@@ -14,7 +14,7 @@
 % Old trained models only have one replica (so no suffix is present)
 % Last N samples per column are averaged to reduce noise/variation
 
-function data_sorted = bnn_plot_logs(folder_path, N, y_max)
+function data_sorted = plot_bnn_logs(folder_path, N, y_max)
 
 % The data files are in the same folder as the script and have this naming convention:
 % - log_<length_meter>.csv

@@ -11,7 +11,7 @@
 
 % Retrieve and process training / validation results from trained BNN predictor
 
-function bnn_loss_tests(folder_path, dataset_key, y_max)
+function plot_bnn_loss(folder_path, dataset_key, y_max)
 
 % Check if folder_path is not defined
 if ~exist('folder_path', 'var')

@@ -1,10 +1,12 @@
+% Author: Jose Cappelletto
+% email:  j.cappelletto@soton.ac.uk / cappelletto@gmail.com
 % Function that computes the spatial autocorrelation for K-transects of
-% predefined lenght L with a spatial resolution deltaX
-
+% predefined length L with a spatial resolution deltaX
+% Spatial resolution and total length is inferred from the input data
 
 function [data, y_transects, acorr_transects, x_threshold] = spatial_acorr (input_file, id_var, distance_var, target_var, corr_threshold)
 % User-defined input (mandatory) variables are:
-% id: UUID employed to group transects. All points from the same transect
+% id: UUID used to group transects. All transects with the same UUID will
 % share the same 'id'
 % distance: (relative) position of each point along the transect, starting
 % from '0'
@@ -66,15 +68,14 @@ y_transects = y;
 
 % Compute autocorrelation for each transect, which is half the length of
 % the transect, max
-% NumLag = P/2 (floor)
 Q = floor (P/2);
 y = zeros(Q,K); % preallocate space for K transects with P points
 x_threshold = zeros(1,K); % store the first index on threshold crossing per transect
 threshold = corr_threshold;
-% For each transect, let's compute its spatial autocorrelation
+% For each transect, let's compute the spatial autocorrelation
 for i=1:K
     y(:,i) = autocorr (y_transects(:,i), 'NumLags', Q-1);
-    x_threshold(i) = find(y(:,i)<threshold, 1); %use only first incidence
+    x_threshold(i) = find(y(:,i)<threshold, 1); % use only first incidence
 end
 acorr_transects = y;
 x_threshold = x_threshold * deltaX;
@@ -99,8 +100,8 @@ label_str = sprintf ("Transect autocorrelation.\nVariable: %s", target_var);
 set (get(gca(), 'YAxis'), 'FontSize', 16)
 ylabel(label_str, 'Interpreter', 'none', 'FontSize',18)
 % disable latex interpreter for title
-title (sprintf ("Spatial autocorrelation of K=%d transects L=%.0f m long vs lag distance\nDataset: %s", K, L, input_file), 'Interpreter', 'none', 'FontSize',18, 'FontWeight', 'normal')
 % disable bold font for title
+title (sprintf ("Spatial autocorrelation of K=%d transects L=%.0f m long vs lag distance\nDataset: %s", K, L, input_file), 'Interpreter', 'none', 'FontSize',18, 'FontWeight', 'normal')
 
 % Scale the index by the mean value of delta X
 % x_threshold = deltaX * x_threshold; % returns first incidence
@@ -113,7 +114,8 @@ line ([min(x),max(x)], [0,0], 'Color',[0.1,0.1,0.2], 'LineStyle','-')
 boxplot(x_threshold-deltaX, 'Orientation', 'horizontal')
 text (mean(x_threshold), 1.2, sprintf("Mean lag\n%.2fm", mean(x_threshold)), 'FontSize',14)
 
-grid on; 
+grid on;
+% plot (scatter) points at the intersections with the horizontal axis (threshold)
 scatter (x_threshold-deltaX, threshold*ones(1,K), 8, [0.5, 0.3, 0.3], 'filled')
 yticks([-0.5:0.5:1.0]); % fix ticks after boxplot readjust (forcing manual didn't work)
 yticklabels([-0.5:0.5:1.0])

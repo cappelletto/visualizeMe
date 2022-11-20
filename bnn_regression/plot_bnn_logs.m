@@ -40,6 +40,9 @@ if folder_path(end) ~= '/'
     folder_path = strcat(folder_path, '/');
 end
 
+% Append the subfolder logs/ to the path
+folder_path = strcat(folder_path, 'log/');
+
 % Retrieve the list of files in the folder
 files = dir (strcat(folder_path, 'log_*.csv'));
 K = length(files)   % Number of files

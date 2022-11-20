@@ -66,6 +66,12 @@ for i = 1:K
         predicted = 10.^predicted;
     end
 
+    if (strfind (data.Properties.VariableNames{1}, 'exp') > 0)
+        sprintf ("Exp transform detected in variable names") 
+        target    = 10.*log(target);     % Original data was transformed using E^(x/10)
+        predicted = 10.*log(predicted);
+    end
+
     % Compute the RMSE of our predictions
     error = rms(target - predicted);
     mean_error(i) = error;

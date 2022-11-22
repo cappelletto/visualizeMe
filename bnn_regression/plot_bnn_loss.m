@@ -85,7 +85,26 @@ data_sorted = sortrows(data_matrix,1);
 length_meter   = data_sorted(:,1);
 mean_error = data_sorted(:,2);
 
-% TODO: Extract the folder path name with the experiment ID and add it to the Title string
+% Show the min, mean and the max value of the error
+min_error = min(mean_error)
+mean_error_total = mean(mean_error)
+max_error = max(mean_error)
+
+% Find unique entries in length_meter
+length_meter_unique = unique(length_meter);
+% Create empty vector to store the mean values of train/validation fit (RMSE)
+mean_error_unique = zeros(length(length_meter_unique),1);
+% Create empty vector to store the standard deviation of train/validation fit (RMSE)
+std_error_unique = zeros(length(length_meter_unique),1);
+
+% For each unique length parameter, aggregate all replicas
+for i = 1:length(length_meter_unique)
+    % Find all replicas of the same length parameter
+    idx = find(length_meter == length_meter_unique(i));
+    % Aggregate the mean values of the last N epochs of loss_recon
+    mean_error_unique(i) = mean(mean_error(idx));
+    std_error_unique(i) = std(mean_error(idx));
+end
 
 if (strfind(dataset_key, 'train') > 0)
     edgeColor = [0 0.4470 0.7410]; % Blue-ish
@@ -97,19 +116,59 @@ else % we should check it is 'valid' otherwise is an error (invalid key defined)
     titleLabelString = 'BNN - Validation loss vs distance parameter';
 end
 
+
+% Before plotting, we create an empty figure
+figure; hold on; grid on;
+% Plot the loss function. X = length_meter, Y = loss
+% scatter(length_meter_unique, mean_error_unique, 'b', 'LineWidth', 2, 'MarkerEdgeAlpha', 0.2);
+%plot (length_meter_unique, mean_train_fit_unique, 'Color', [0, 0, 1, 0.2], 'LineWidth', 1.5);
+
+% We can plot the boxplot of each loss function using the unique index of the length parameter
+% For each unique length parameter, show the box plot of the loss functions for training dataset
+for i = 1:length(length_meter_unique)
+    % Find all replicas of the same length parameter
+    idx = find(length_meter == length_meter_unique(i));
+    % Aggregate the mean values of the last N epochs of loss_recon
+    boxplot(mean_error(idx), 'positions', length_meter_unique(i), 'widths', 3, 'colors', edgeColor);
+
+    % show the mean error when i=1
+    if (i == 1)
+        mean_none = mean(mean_error(idx))
+    end
+end
+% Set gca  xtick labels and positions to a regular grid that divides the x axis into N equal intervals
+xgrid = linspace(0, max(length_meter), 11);
+set(gca, 'XTick', xgrid, 'XTickLabel', xgrid);
+xlabel('Distance parameter (m)', 'FontSize', 16);
+ylabel( YLabelString, 'FontSize', 16);
+if ~exist('y_max','var') % User defined ylimits (for figure comparison)
+    ylim([0 max(mean_error)*1.05])
+else
+    ylim([0 y_max])
+end
+% Add a line to the plot with the mean error
+plot([0 max(length_meter)], [mean_error_total mean_error_total], 'r--', 'LineWidth', 1);
+% Add floating text on top of the line with the mean error
+text(max(length_meter)*0.8, mean_error_total*1.1, sprintf('Mean error: %.2f', mean_error_total), 'Color', 'r', 'FontSize', 16);
+legend ('RMSE of predictions',  FontSize=16);
+title (titleLabelString, FontSize = 18);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Before plotting, we create an empty figure
 figure; hold on; grid on;
 % Plot the loss function. X = length_meter, Y = loss
 scatter(length_meter, mean_error, 'b', 'LineWidth', 2, 'MarkerEdgeAlpha', 0.3, 'MarkerEdgeColor', edgeColor);
 xlabel('Distance parameter (m)', 'FontSize', 16);
 ylabel( YLabelString, 'FontSize', 16);
-legend ('RMSE of predictions');
 if ~exist('y_max','var') % User defined ylimits (for figure comparison)
     ylim([0 max(mean_error)*1.05])
 else
     ylim([0 y_max])
 end
 
-title (titleLabelString);
+title (titleLabelString, FontSize = 18);
+% Add a line to the plot with the mean error
+plot([0 max(length_meter)], [mean_error_total mean_error_total], 'r--', 'LineWidth', 1);
+legend ('RMSE of predictions', "Mean error: " + num2str(mean_error_total), FontSize=16);
 
 % TODO: Replace scatter plot with violin or boxplots (compute mean/stdv)

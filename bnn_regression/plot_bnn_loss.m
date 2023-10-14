@@ -129,7 +129,7 @@ for i = 1:length(length_meter_unique)
     % Find all replicas of the same length parameter
     idx = find(length_meter == length_meter_unique(i));
     % Aggregate the mean values of the last N epochs of loss_recon
-    boxplot(mean_error(idx), 'positions', length_meter_unique(i), 'widths', 3, 'colors', edgeColor);
+    boxplot(mean_error(idx), 'positions', length_meter_unique(i), 'widths', 3, 'colors', edgeColor, FillColor = 'r');
 
     % show the mean error when i=1
     if (i == 1)
@@ -150,8 +150,8 @@ end
 plot([0 max(length_meter)], [mean_error_total mean_error_total], 'r--', 'LineWidth', 1);
 % Add floating text on top of the line with the mean error
 text(max(length_meter)*0.8, mean_error_total*1.1, sprintf('Mean error: %.2f', mean_error_total), 'Color', 'r', 'FontSize', 16);
-legend ('RMSE of predictions',  FontSize=16);
-title (titleLabelString, FontSize = 18);
+legend ('RMSE of predictions',  FontSize=18);
+title (titleLabelString, FontSize = 20);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Before plotting, we create an empty figure
@@ -166,9 +166,9 @@ else
     ylim([0 y_max])
 end
 
-title (titleLabelString, FontSize = 18);
+title (titleLabelString, FontSize = 20);
 % Add a line to the plot with the mean error
 plot([0 max(length_meter)], [mean_error_total mean_error_total], 'r--', 'LineWidth', 1);
-legend ('RMSE of predictions', "Mean error: " + num2str(mean_error_total), FontSize=16);
+legend ('RMSE of predictions', "Mean error: " + num2str(mean_error_total), FontSize=18);
 
 % TODO: Replace scatter plot with violin or boxplots (compute mean/stdv)

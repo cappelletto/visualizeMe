@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import argparse
 
 # Improved function to handle CSV files with various distance parameters
-def plot_bnn_loss(folder_path, dataset_key='valid', y_max=None, output_plot=None):
+def plot_bnn_loss(folder_path, dataset_key='valid', y_max=None, output_plot=None, output_csv=None):
     # Construct folder path based on dataset key
     folder_path = os.path.join(folder_path, dataset_key)
     
@@ -17,6 +17,8 @@ def plot_bnn_loss(folder_path, dataset_key='valid', y_max=None, output_plot=None
     # Initialize arrays to store results
     mean_error = []
     length_meter = []
+    transformation = []
+    csv_rows = []
     
     # Process each file to compute RMSE
     for file_path in files:
@@ -37,16 +39,30 @@ def plot_bnn_loss(folder_path, dataset_key='valid', y_max=None, output_plot=None
         predicted = data.iloc[:, 1]
         
         # Check for transformations in column names
+        current_transformation = 'none'
         if 'log' in data.columns[0].lower():
             target = 10 ** target
             predicted = 10 ** predicted
+            current_transformation = 'log-normal'
         elif 'exp' in data.columns[0].lower():
             target = 10 * np.log(target)
             predicted = 10 * np.log(predicted)
+            current_transformation = 'exponential'
+        
+        transformation.append(current_transformation)
         
         # Calculate RMSE
         error = np.sqrt(np.mean((target - predicted) ** 2))
         mean_error.append(error)
+        
+        # Store data for CSV export
+        csv_rows.append({
+            'key': dataset_key,
+            'length[m]': length,
+            'transformation': current_transformation,
+            'mean_error': error,
+            'std_error': 0  # Placeholder for std_error since we don't have it per replica
+        })
     
     # Convert lists to arrays for sorting and aggregation
     length_meter = np.array(length_meter)
@@ -110,6 +126,11 @@ def plot_bnn_loss(folder_path, dataset_key='valid', y_max=None, output_plot=None
         plt.savefig(f"{output_plot}_scatter.png")
     else:
         plt.show()
+    
+    # Export CSV if output_csv is provided
+    if output_csv:
+        output_df = pd.DataFrame(csv_rows)
+        output_df.to_csv(output_csv, index=False)
 
 def main():
     # Argument parser for CLI
@@ -118,11 +139,12 @@ def main():
     parser.add_argument('--dataset_key', type=str, default='valid', choices=['train', 'valid'], help='Dataset key to specify either "train" or "valid". Default is "valid".')
     parser.add_argument('--y_max', type=float, default=None, help='Optional upper limit for y-axis on the plot.')
     parser.add_argument('--output_plot', type=str, default=None, help='File path to save the plot images. If not provided, plots will be shown directly.')
+    parser.add_argument('--output_csv', type=str, default=None, help='File path to save the output CSV containing mean and std error for each replica.')
 
     args = parser.parse_args()
     
     # Call the function with parsed arguments
-    plot_bnn_loss(folder_path=args.folder_path, dataset_key=args.dataset_key, y_max=args.y_max, output_plot=args.output_plot)
+    plot_bnn_loss(folder_path=args.folder_path, dataset_key=args.dataset_key, y_max=args.y_max, output_plot=args.output_plot, output_csv=args.output_csv)
 
 if __name__ == '__main__':
     main()
